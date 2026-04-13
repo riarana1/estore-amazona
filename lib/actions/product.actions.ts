@@ -2,6 +2,12 @@
 
 import { connectToDatabase } from '@/lib/db'
 import Product, { IProduct } from '@/lib/db/models/product.model'
+import { PAGE_SIZE } from '../constants'
+
+// Define a type for the plain object returned by .lean()
+type LeanProduct = {
+  _id: { toString(): string }
+} & Omit<IProduct, '_id'>
 
 export async function getAllCategories() {
   await connectToDatabase()
@@ -33,11 +39,13 @@ export async function getProductsForCard({
     returning plain objects. This is much faster and prevents "internal" Mongoose 
     state from being leaked to the client */
     .lean()
-  return JSON.parse(JSON.stringify(products)) as {
-    name: string
-    href: string
-    image: string
-  }[]
+  return (
+    products as unknown as { name: string; href: string; image: string }[]
+  ).map((p) => ({
+    name: p.name,
+    href: p.href,
+    image: p.image,
+  }))
 }
 
 // GET PRODUCTS BY TAG
@@ -56,5 +64,96 @@ export async function getProductsByTag({
     .sort({ createdAt: 'desc' })
     .limit(limit)
     .lean()
-  return JSON.parse(JSON.stringify(products)) as IProduct[]
+
+  const leanProducts = products as unknown as LeanProduct[]
+  return leanProducts.map((p) => {
+    // Manually pick fields to ensure no nested ObjectIds/Buffers leak to the client
+    return {
+      _id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      category: p.category,
+      images: p.images,
+      brand: p.brand,
+      price: p.price,
+      listPrice: p.listPrice,
+      avgRating: p.avgRating,
+      numReviews: p.numReviews,
+      countInStock: p.countInStock,
+      description: p.description,
+      tags: p.tags,
+      colors: p.colors,
+      sizes: p.sizes,
+    } as unknown as IProduct
+  })
+}
+
+// GET ONE PRODUCT BY SLUG
+export async function getProductBySlug(slug: string) {
+  await connectToDatabase()
+  const product = await Product.findOne({ slug, isPublished: true }).lean()
+  if (!product) throw new Error('Product not found')
+  const p = product as unknown as LeanProduct
+  // Explicit mapping ensures serialization safety for the Client Boundary
+  return {
+    _id: p._id.toString(),
+    name: p.name,
+    slug: p.slug,
+    category: p.category,
+    images: p.images,
+    brand: p.brand,
+    price: p.price,
+    listPrice: p.listPrice,
+    avgRating: p.avgRating,
+    numReviews: p.numReviews,
+    countInStock: p.countInStock,
+    description: p.description,
+    tags: p.tags,
+    colors: p.colors,
+    sizes: p.sizes,
+  } as unknown as IProduct
+}
+// GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
+export async function getRelatedProductsByCategory({
+  category,
+  productId,
+  limit = PAGE_SIZE,
+  page = 1,
+}: {
+  category: string
+  productId: string
+  limit?: number
+  page: number
+}) {
+  await connectToDatabase()
+  const skipAmount = (Number(page) - 1) * limit
+  const conditions = {
+    isPublished: true,
+    category,
+    _id: { $ne: productId },
+  }
+  const products = await Product.find(conditions)
+    .sort({ numSales: 'desc' })
+    .skip(skipAmount)
+    .limit(limit)
+    .lean()
+  const productsCount = await Product.countDocuments(conditions).lean()
+  const leanProducts = products as unknown as LeanProduct[]
+  return {
+    data: leanProducts.map((p) => ({
+      _id: p._id.toString(),
+      name: p.name,
+      slug: p.slug,
+      category: p.category,
+      images: p.images,
+      brand: p.brand,
+      price: p.price,
+      listPrice: p.listPrice,
+      avgRating: p.avgRating,
+      numReviews: p.numReviews,
+      countInStock: p.countInStock,
+      tags: p.tags,
+    })) as unknown as IProduct[],
+    totalPages: Math.ceil(productsCount / limit),
+  }
 }
