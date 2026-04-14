@@ -30,7 +30,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
               alt={'product image'}
               width={48}
               height={48}
-              style={{ height: 'auto' }}
+              style={{ width: 'auto', height: 'auto' }}
             />
           </button>
         ))}
@@ -43,9 +43,10 @@ export default function ProductGallery({ images }: { images: string[] }) {
               src={images[selectedImage]}
               alt={'product image'}
               fill
-              sizes="90vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               style={{ objectFit: 'contain' }}
-              priority
+              loading="eager"
+              fetchPriority="high"
             />
           </div>
         </Zoom>
