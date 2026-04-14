@@ -1,13 +1,14 @@
 import Image from 'next/image'
 import Link from 'next/link'
 
-import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { IProduct } from '@/lib/db/models/product.model'
 
 import Rating from './rating'
-import { formatNumber } from '@/lib/utils'
+import { formatNumber, generateId, round2 } from '@/lib/utils'
 import ProductPrice from './product-price'
 import ImageHover from './image-hover'
+import AddToCart from './add-to-cart'
 
 const ProductImage = ({ product }: { product: IProduct }) => (
   <Link href={`/product/${product.slug}`}>
@@ -19,15 +20,13 @@ const ProductImage = ({ product }: { product: IProduct }) => (
           alt={product.name}
         />
       ) : (
-        <div className="relative h-52">
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            fill
-            sizes="80vw"
-            className="object-contain"
-          />
-        </div>
+        <Image
+          src={product.images[0]}
+          alt={product.name}
+          fill
+          sizes="80vw"
+          style={{ objectFit: 'contain' }}
+        />
       )}
     </div>
   </Link>
@@ -61,10 +60,32 @@ const ProductDetails = ({ product }: { product: IProduct }) => (
   </div>
 )
 
+const AddButton = ({ product }: { product: IProduct }) => (
+  <div className="w-full text-center">
+    <AddToCart
+      minimal
+      item={{
+        clientId: generateId(),
+        product: product._id.toString(),
+        size: product.sizes[0],
+        color: product.colors[0],
+        countInStock: product.countInStock,
+        name: product.name,
+        slug: product.slug,
+        category: product.category,
+        price: round2(product.price),
+        quantity: 1,
+        image: product.images[0],
+      }}
+    />
+  </div>
+)
+
 const ProductCard = ({
   product,
   hideBorder = false,
   hideDetails = false,
+  hideAddToCart = false,
 }: {
   product: IProduct
   hideDetails?: boolean
@@ -79,6 +100,7 @@ const ProductCard = ({
           <div className="p-3 flex-1 text-center">
             <ProductDetails product={product} />
           </div>
+          {!hideAddToCart && <AddButton product={product} />}
         </>
       )}
     </div>
@@ -92,6 +114,9 @@ const ProductCard = ({
           <CardContent className="p-3 flex-1 text-center">
             <ProductDetails product={product} />
           </CardContent>
+          <CardFooter className="p-3">
+            {!hideAddToCart && <AddButton product={product} />}
+          </CardFooter>
         </>
       )}
     </Card>

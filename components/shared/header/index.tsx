@@ -23,6 +23,7 @@ export default function Header() {
                 src="/icons/logo.svg"
                 width={40}
                 height={40}
+                style={{ height: '40px', width: 'auto' }}
                 loading="eager"
                 unoptimized
                 alt={`${APP_NAME} logo`}

@@ -34,18 +34,20 @@ const ImageHover = ({
         alt={alt}
         fill
         sizes="80vw"
-        className={`object-contain transition-opacity duration-500 ${
+        className={`transition-opacity duration-500 ${
           isHovered ? 'opacity-0' : 'opacity-100'
         }`}
+        style={{ objectFit: 'contain' }}
       />
       <Image
         src={hoverSrc}
         alt={alt}
         fill
         sizes="80vw"
-        className={`absolute inset-0 object-contain transition-opacity duration-500 ${
+        className={`transition-opacity duration-500 ${
           isHovered ? 'opacity-100' : 'opacity-0'
         }`}
+        style={{ objectFit: 'contain' }}
       />
     </div>
   )

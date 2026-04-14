@@ -25,7 +25,13 @@ export default function ProductGallery({ images }: { images: string[] }) {
                 : 'ring-1 ring-gray-300'
             }`}
           >
-            <Image src={image} alt={'product image'} width={48} height={48} />
+            <Image
+              src={image}
+              alt={'product image'}
+              width={48}
+              height={48}
+              style={{ height: 'auto' }}
+            />
           </button>
         ))}
       </div>
@@ -38,7 +44,7 @@ export default function ProductGallery({ images }: { images: string[] }) {
               alt={'product image'}
               fill
               sizes="90vw"
-              className="object-contain"
+              style={{ objectFit: 'contain' }}
               priority
             />
           </div>
