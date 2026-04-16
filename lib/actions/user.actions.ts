@@ -1,7 +1,9 @@
 'use server'
 
 import bcrypt from 'bcryptjs'
+
 import { signIn, signOut } from '@/auth'
+
 import { IUserSignIn, IUserSignUp } from '@/types'
 import { UserSignUpSchema } from '../validator'
 import { connectToDatabase } from '../db'
@@ -28,6 +30,10 @@ export async function registerUser(userSignUp: IUserSignUp) {
   } catch (error) {
     return { success: false, error: formatError(error) }
   }
+}
+
+export const SignInWithGoogle = async () => {
+  await signIn('google')
 }
 
 export async function signInWithCredentials(user: IUserSignIn) {

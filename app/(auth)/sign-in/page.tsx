@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import CredentialsSignInForm from './credentials-signin-form'
 import { Button } from '@/components/ui/button'
 import { APP_NAME } from '@/lib/constants'
+import { GoogleSignInForm } from './google-signin-form'
 
 export const metadata: Metadata = {
   title: 'Sign In',
@@ -41,12 +42,15 @@ export default async function SignIn(props: {
         </CardContent>
       </Card>
       <SeparatorWithOr>New to {APP_NAME}?</SeparatorWithOr>
-
       <Link href={`/sign-up?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
         <Button className="w-full" variant="outline">
           Create your {APP_NAME} account
         </Button>
       </Link>
+      <SeparatorWithOr />
+      <div className="mt-4">
+        <GoogleSignInForm />
+      </div>
     </div>
   )
 }
