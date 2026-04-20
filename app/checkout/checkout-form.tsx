@@ -231,11 +231,18 @@ const CheckoutForm = () => {
 
   // TODO: place order
   const handlePlaceOrder = async () => {
+    if (deliveryDateIndex === undefined || deliveryDateIndex === null) {
+      toast({
+        description: 'Please select a delivery date',
+        variant: 'destructive',
+      })
+      return
+    }
     const res = await createOrder({
       items,
       shippingAddress,
       expectedDeliveryDate: calculateFutureDate(
-        availableDeliveryDates[deliveryDateIndex!].daysToDeliver,
+        availableDeliveryDates[deliveryDateIndex].daysToDeliver,
       ),
       deliveryDateIndex,
       paymentMethod,
@@ -573,7 +580,7 @@ const CheckoutForm = () => {
                           formatDateTime(
                             calculateFutureDate(
                               availableDeliveryDates[deliveryDateIndex!]
-                                .daysToDeliver,
+                                ?.daysToDeliver || 0,
                             ),
                           ).dateOnly
                         }
@@ -642,7 +649,8 @@ const CheckoutForm = () => {
                           <ul>
                             <RadioGroup
                               value={
-                                availableDeliveryDates[deliveryDateIndex!].name
+                                availableDeliveryDates[deliveryDateIndex!]
+                                  ?.name || ''
                               }
                               onValueChange={(value) =>
                                 setDeliveryDateIndex(

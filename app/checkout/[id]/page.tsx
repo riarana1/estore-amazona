@@ -1,5 +1,4 @@
 import { notFound } from 'next/navigation'
-import React from 'react'
 
 import { auth } from '@/auth'
 import { getOrderById } from '@/lib/actions/order.actions'
