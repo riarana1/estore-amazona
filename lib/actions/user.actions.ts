@@ -8,7 +8,7 @@ import { IUserSignIn, IUserSignUp } from '@/types'
 import { UserSignUpSchema } from '../validator'
 import { connectToDatabase } from '../db'
 import User from '../db/models/user.model'
-import { formatError, FormattableError } from '../utils'
+import { formatError } from '../utils'
 import { redirect } from 'next/navigation'
 
 // CREATE
@@ -28,7 +28,7 @@ export async function registerUser(userSignUp: IUserSignUp) {
     })
     return { success: true, message: 'User created successfully' }
   } catch (error) {
-    return { success: false, error: formatError(error as FormattableError) }
+    return { success: false, error: formatError(error) }
   }
 }
 

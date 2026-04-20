@@ -43,13 +43,13 @@ import ProductPrice from '@/components/shared/product/product-price'
 const shippingAddressDefaultValues =
   process.env.NODE_ENV === 'development'
     ? {
-        fullName: 'Basir',
+        fullName: 'awesoft',
         street: '1911, 65 Sherbrooke Est',
         city: 'Montreal',
-        province: 'Quebec',
+        province: 'Texas',
         phone: '4181234567',
         postalCode: 'H2X 1C4',
-        country: 'Canada',
+        country: 'US',
       }
     : {
         fullName: '',
@@ -229,6 +229,7 @@ const CheckoutForm = () => {
   const [isDeliveryDateSelected, setIsDeliveryDateSelected] =
     useState<boolean>(false)
 
+  // TODO: place order
   const handlePlaceOrder = async () => {
     const res = await createOrder({
       items,
