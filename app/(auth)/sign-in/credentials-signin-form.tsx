@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form'
 import { IUserSignIn } from '@/types'
 import { signInWithCredentials } from '@/lib/actions/user.actions'
 
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignInSchema } from '@/lib/validator'
 import { isRedirectError } from 'next/dist/client/components/redirect-error'
@@ -55,11 +55,7 @@ export default function CredentialsSignInForm() {
       if (isRedirectError(error)) {
         throw error
       }
-      toast({
-        title: 'Error',
-        description: 'Invalid email or password',
-        variant: 'destructive',
-      })
+      toast.error('Invalid email or password')
     }
   }
 

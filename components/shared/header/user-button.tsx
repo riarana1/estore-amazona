@@ -54,11 +54,12 @@ export default async function UserButton() {
                 </Link>
               )}
             </DropdownMenuGroup>
-            <DropdownMenuItem className="p-0 mb-1">
+            <DropdownMenuItem className="p-0 mb-1" asChild>
               <form action={SignOut} className="w-full">
                 <Button
                   className="w-full py-4 px-2 h-4 justify-start"
                   variant="ghost"
+                  type="submit"
                 >
                   Sign out
                 </Button>

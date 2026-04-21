@@ -15,7 +15,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { IUserSignUp } from '@/types'
 import { registerUser, signInWithCredentials } from '@/lib/actions/user.actions'
-import { toast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { UserSignUpSchema } from '@/lib/validator'
 import { Separator } from '@/components/ui/separator'
@@ -52,11 +52,7 @@ export default function SignUpForm() {
     try {
       const res = await registerUser(data)
       if (!res.success) {
-        toast({
-          title: 'Error',
-          description: res.error,
-          variant: 'destructive',
-        })
+        toast.error(res.message)
         return
       }
       await signInWithCredentials({
@@ -68,11 +64,7 @@ export default function SignUpForm() {
       if (isRedirectError(error)) {
         throw error
       }
-      toast({
-        title: 'Error',
-        description: 'Invalid email or password',
-        variant: 'destructive',
-      })
+      toast.error('Invalid email or password')
     }
   }
 

@@ -22,7 +22,7 @@ export default function ClientProviders({
       ) : (
         <div>{children}</div>
       )}
-      <Toaster />
+      <Toaster position="top-right" theme="dark" richColors />
     </>
   )
 }

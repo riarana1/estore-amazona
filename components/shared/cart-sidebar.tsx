@@ -79,13 +79,13 @@ export default function CartSidebar() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {Array.from({ length: item.countInStock }).map(
-                          (_, i) => (
-                            <SelectItem value={(i + 1).toString()} key={i + 1}>
-                              {i + 1}
-                            </SelectItem>
-                          ),
-                        )}
+                        {Array.from({
+                          length: Math.min(item.countInStock, 10),
+                        }).map((_, i) => (
+                          <SelectItem value={(i + 1).toString()} key={i + 1}>
+                            {i + 1}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <Button

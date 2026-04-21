@@ -6,13 +6,17 @@ import {
   usePayPalScriptReducer,
 } from '@paypal/react-paypal-js'
 import { Card, CardContent } from '@/components/ui/card'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import {
   approvePayPalOrder,
   createPayPalOrder,
 } from '@/lib/actions/order.actions'
 import { IOrder } from '@/lib/db/models/order.model'
 import { formatDateTime } from '@/lib/utils'
+
+import StripeForm from './stripe-form'
+import { Elements } from '@stripe/react-stripe-js'
+import { loadStripe } from '@stripe/stripe-js'
 
 import CheckoutFooter from '../checkout-footer'
 import { redirect, useRouter } from 'next/navigation'
@@ -22,10 +26,12 @@ import ProductPrice from '@/components/shared/product/product-price'
 export default function OrderPaymentForm({
   order,
   paypalClientId,
+  clientSecret,
 }: {
   order: IOrder
   paypalClientId: string
   isAdmin: boolean
+  clientSecret: string | null
 }) {
   const router = useRouter()
   const {
@@ -39,7 +45,6 @@ export default function OrderPaymentForm({
     expectedDeliveryDate,
     isPaid,
   } = order
-  const { toast } = useToast()
 
   if (isPaid) {
     redirect(`/account/orders/${order._id}`)
@@ -56,19 +61,17 @@ export default function OrderPaymentForm({
   }
   const handleCreatePayPalOrder = async () => {
     const res = await createPayPalOrder(order._id.toString())
-    if (!res.success)
-      return toast({
-        description: res.message,
-        variant: 'destructive',
-      })
+    if (!res.success) return toast.error(res.message)
+
     return res.data
   }
   const handleApprovePayPalOrder = async (data: { orderID: string }) => {
     const res = await approvePayPalOrder(order._id.toString(), data)
-    toast({
-      description: res.message,
-      variant: res.success ? 'default' : 'destructive',
-    })
+    if (!res.success) {
+      toast.error(res.message)
+    } else {
+      toast.success(res.message)
+    }
   }
 
   const CheckoutSummary = () => (
@@ -113,7 +116,6 @@ export default function OrderPaymentForm({
                 <ProductPrice price={totalPrice} plain />
               </span>
             </div>
-
             {!isPaid && paymentMethod === 'PayPal' && (
               <div>
                 <PayPalScriptProvider options={{ clientId: paypalClientId }}>
@@ -125,7 +127,19 @@ export default function OrderPaymentForm({
                 </PayPalScriptProvider>
               </div>
             )}
-
+            {!isPaid && paymentMethod === 'Stripe' && clientSecret && (
+              <Elements
+                options={{
+                  clientSecret,
+                }}
+                stripe={stripePromise}
+              >
+                <StripeForm
+                  priceInCents={Math.round(order.totalPrice * 100)}
+                  orderId={order._id.toString()}
+                />
+              </Elements>
+            )}
             {!isPaid && paymentMethod === 'Cash On Delivery' && (
               <Button
                 className="w-full rounded-full"
@@ -139,7 +153,9 @@ export default function OrderPaymentForm({
       </CardContent>
     </Card>
   )
-
+  const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY as string,
+  )
   return (
     <main className="max-w-6xl mx-auto">
       <div className="grid md:grid-cols-4 gap-6">

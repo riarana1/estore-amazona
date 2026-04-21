@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
+import { toast } from 'sonner'
 import { createOrder } from '@/lib/actions/order.actions'
 import {
   calculateFutureDate,
@@ -172,7 +172,6 @@ const CheckoutSummary = ({
 )
 
 const CheckoutForm = () => {
-  const { toast } = useToast()
   const router = useRouter()
   const {
     setting: {
@@ -221,7 +220,7 @@ const CheckoutForm = () => {
     shippingAddressForm.setValue('postalCode', shippingAddress.postalCode)
     shippingAddressForm.setValue('province', shippingAddress.province)
     shippingAddressForm.setValue('phone', shippingAddress.phone)
-  }, [items, isMounted, router, shippingAddress, shippingAddressForm])
+  }, [isMounted, shippingAddress, shippingAddressForm])
 
   const [isAddressSelected, setIsAddressSelected] = useState<boolean>(false)
   const [isPaymentMethodSelected, setIsPaymentMethodSelected] =
@@ -232,10 +231,7 @@ const CheckoutForm = () => {
   // TODO: place order
   const handlePlaceOrder = async () => {
     if (deliveryDateIndex === undefined || deliveryDateIndex === null) {
-      toast({
-        description: 'Please select a delivery date',
-        variant: 'destructive',
-      })
+      toast.error('Please select a delivery date')
       return
     }
     const res = await createOrder({
@@ -252,15 +248,9 @@ const CheckoutForm = () => {
       totalPrice,
     })
     if (!res.success) {
-      toast({
-        description: res.message,
-        variant: 'destructive',
-      })
+      toast.error(res.message)
     } else {
-      toast({
-        description: res.message,
-        variant: 'default',
-      })
+      toast.success(res.message, { duration: 4000, icon: '🎉' })
       clearCart()
       router.push(`/checkout/${res.data?.orderId}`)
     }
