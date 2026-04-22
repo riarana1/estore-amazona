@@ -6,6 +6,7 @@ import {
   OrderItemSchema,
   PaymentMethodSchema,
   ProductInputSchema,
+  ReviewInputSchema,
   SettingInputSchema,
   ShippingAddressSchema,
   SiteCurrencySchema,
@@ -70,3 +71,12 @@ export type SiteLanguage = z.infer<typeof SiteLanguageSchema>
 export type SiteCurrency = z.infer<typeof SiteCurrencySchema>
 export type PaymentMethod = z.infer<typeof PaymentMethodSchema>
 export type DeliveryDate = z.infer<typeof DeliveryDateSchema>
+
+export type IReviewInput = z.infer<typeof ReviewInputSchema>
+export type IReviewDetails = IReviewInput & {
+  _id: string
+  createdAt: string
+  user: {
+    name: string
+  }
+}
