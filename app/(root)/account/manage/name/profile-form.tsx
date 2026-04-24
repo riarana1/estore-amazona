@@ -47,7 +47,7 @@ export const ProfileForm = () => {
     //toast.message(message)
     toast(message, {
       description: 'Update new session', // Adds subtitle
-      duration: 5000, // Duration in ms
+      duration: 3000, // Duration in ms
       position: 'top-right', // Custom position
     })
     router.push('/account/manage')

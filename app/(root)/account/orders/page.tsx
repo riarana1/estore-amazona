@@ -1,50 +1,67 @@
-import { notFound } from 'next/navigation'
-import React from 'react'
-
-import { auth } from '@/auth'
-import { getOrderById } from '@/lib/actions/order.actions'
-import OrderDetailsForm from '@/components/shared/order/order-details-form'
+import BrowsingHistoryList from '@/components/shared/browsing-history-list'
+import { Card, CardContent } from '@/components/ui/card'
+import { Home, PackageCheckIcon, User } from 'lucide-react'
+import { Metadata } from 'next'
 import Link from 'next/link'
-import { formatId } from '@/lib/utils'
 
-export async function generateMetadata(props: {
-  params: Promise<{ id: string }>
-}) {
-  const params = await props.params
-
-  return {
-    title: `Order ${formatId(params.id)}`,
-  }
+const PAGE_TITLE = 'Your Account'
+export const metadata: Metadata = {
+  title: PAGE_TITLE,
 }
-
-export default async function OrderDetailsPage(props: {
-  params: Promise<{
-    id: string
-  }>
-}) {
-  const params = await props.params
-
-  const { id } = params
-
-  const order = await getOrderById(id)
-  if (!order) notFound()
-
-  const session = await auth()
-
+export default function AccountPage() {
   return (
-    <>
-      <div className="flex gap-2">
-        <Link href="/account">Your Account</Link>
-        <span>›</span>
-        <Link href="/account/orders">Your Orders</Link>
-        <span>›</span>
-        <span>Order {formatId(order._id.toString())}</span>
+    <div>
+      <h1 className="h1-bold py-4">{PAGE_TITLE}</h1>
+      <div className="grid md:grid-cols-3 gap-4 items-stretch">
+        <Card>
+          <Link href="/account/orders">
+            <CardContent className="flex items-start gap-4 p-6">
+              <div>
+                <PackageCheckIcon className="w-12 h-12" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Orders</h2>
+                <p className="text-muted-foreground">
+                  Track, return, cancel an order, download invoice or buy again
+                </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card>
+          <Link href="/account/manage">
+            <CardContent className="flex items-start gap-4 p-6">
+              <div>
+                <User className="w-12 h-12" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Login & security</h2>
+                <p className="text-muted-foreground">
+                  Manage password, email and mobile number
+                </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
+
+        <Card>
+          <Link href="/account/addresses">
+            <CardContent className="flex items-start gap-4 p-6">
+              <div>
+                <Home className="w-12 h-12" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold">Addresses</h2>
+                <p className="text-muted-foreground">
+                  Edit, remove or set default address
+                </p>
+              </div>
+            </CardContent>
+          </Link>
+        </Card>
       </div>
-      <h1 className="h1-bold py-4">Order {formatId(order._id.toString())}</h1>
-      <OrderDetailsForm
-        order={order}
-        isAdmin={session?.user?.role === 'Admin' || false}
-      />
-    </>
+      <BrowsingHistoryList className="mt-16" />
+    </div>
   )
 }
