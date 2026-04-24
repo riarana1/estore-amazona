@@ -4,6 +4,8 @@ import { twMerge } from 'tailwind-merge'
 import { OrderItem, ShippingAddress } from '@/types'
 import { ZodError } from 'zod' // Import ZodError from zod
 
+import qs from 'query-string'
+
 // Define a type for Mongoose ValidationError
 interface MongooseValidationError extends Error {
   name: 'ValidationError'
@@ -231,4 +233,26 @@ export const calculateCartPrices = ({
 
 export function formatId(id: string) {
   return `..${id.substring(id.length - 6)}`
+}
+
+export function formUrlQuery({
+  params,
+  key,
+  value,
+}: {
+  params: string
+  key: string
+  value: string | null
+}) {
+  const currentUrl = qs.parse(params)
+
+  currentUrl[key] = value
+
+  return qs.stringifyUrl(
+    {
+      url: window.location.pathname,
+      query: currentUrl,
+    },
+    { skipNull: true },
+  )
 }
